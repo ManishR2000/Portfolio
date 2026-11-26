@@ -1,5 +1,7 @@
 import { motion } from "framer-motion";
-import { ArrowRight, Download, Github, Linkedin, Mail, Twitter } from "lucide-react";
+import { ArrowRight, Download, Linkedin, Mail } from "lucide-react";
+import { profile } from "../../content";
+import { BehanceIcon } from "../icons/BehanceIcon";
 import TechStackSection from "../TechStackSection/TechStackSection";
 import { Button } from "../lightswind/button";
 import { Badge } from "../lightswind/badge";
@@ -34,7 +36,7 @@ export const HeroSection = () => {
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
                 <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
               </span>
-              <span className="text-xs font-medium text-muted-foreground">Available for work</span>
+              <span className="text-xs font-medium text-muted-foreground">{profile.availability}</span>
             </Badge>
           </motion.div>
 
@@ -44,26 +46,25 @@ export const HeroSection = () => {
             transition={{ delay: 0.3, duration: 0.8 }}
             className="mb-4 text-center md:text-left"
           >
-            <h1 className="text-5xl md:text-7xl font-bold tracking-tight mb-2">
-              Hi, I'm
-            </h1>
-            
-            {/* Light Theme: Clean Vibrant Gradient Text */}
-            <div className="block dark:hidden">
-              <span className="bg-gradient-to-r from-violet-600 via-sky-500 via-purple-600 to-indigo-600 bg-clip-text text-transparent font-extrabold text-[clamp(3rem,6.5vw,5.5rem)] leading-none tracking-tight block pb-2 select-none">
-                Scarlett Rose
-              </span>
-            </div>
+            {/* "Hi, I'm" and the name share one line at the same size */}
+            <h1 className="flex flex-wrap items-center justify-center md:justify-start gap-x-[0.25em] font-bold tracking-tight leading-none text-[clamp(2.5rem,4.6vw,4.25rem)]">
+              <span className="pb-2">Hi, I'm</span>
 
-            {/* Dark Theme: Rich Lightswind Aurora Text Effect */}
-            <div className="hidden dark:block">
-              <AuroraTextEffect
-                text="Scarlett Rose"
-                fontSize="clamp(3rem, 6.5vw, 5.5rem)"
-                className="bg-transparent overflow-visible p-0 justify-start"
-                textClassName="bg-gradient-to-r from-cyan-400 via-purple-400 to-sky-300 bg-clip-text text-transparent pb-2 font-extrabold"
-              />
-            </div>
+              {/* Light theme: gradient text */}
+              <span className="dark:hidden bg-gradient-to-r from-violet-600 via-sky-500 via-purple-600 to-indigo-600 bg-clip-text text-transparent font-extrabold pb-2 select-none">
+                {profile.name}
+              </span>
+
+              {/* Dark theme: aurora text effect */}
+              <span className="hidden dark:inline-flex">
+                <AuroraTextEffect
+                  text={profile.name}
+                  fontSize="clamp(2.5rem, 4.6vw, 4.25rem)"
+                  className="bg-transparent overflow-visible p-0 justify-start"
+                  textClassName="bg-gradient-to-r from-cyan-400 via-purple-400 to-sky-300 bg-clip-text text-transparent pb-2 font-extrabold leading-none"
+                />
+              </span>
+            </h1>
           </motion.div>
 
           <motion.p 
@@ -72,7 +73,8 @@ export const HeroSection = () => {
             animate={{ opacity: 1 }}
             transition={{ delay: 0.5, duration: 0.8 }}
           >
-            I build exceptional and accessible digital experiences. Specialized in crafting premium web applications with elegant design systems.
+            <span className="block text-foreground font-semibold mb-1">{profile.role}</span>
+            {profile.intro}
           </motion.p>
 
           <motion.div 
@@ -84,9 +86,11 @@ export const HeroSection = () => {
             <Button size="lg" onClick={() => document.getElementById("projects")?.scrollIntoView({ behavior: "smooth" })} className="rounded-full px-7 h-12 bg-primary text-primary-foreground font-semibold flex items-center gap-2 hover:bg-primary/90 transition-all shadow-[0_0_20px_rgba(139,92,246,0.3)] hover:shadow-[0_0_30px_rgba(139,92,246,0.5)] hover:-translate-y-1">
               View Work <ArrowRight className="w-4 h-4" />
             </Button>
-            <Button size="lg" variant="outline" className="rounded-full px-7 h-12 glass-panel text-foreground font-semibold flex items-center gap-2 hover:bg-foreground/10 transition-all hover:-translate-y-1 border-foreground/10">
-              Resume <Download className="w-4 h-4" />
-            </Button>
+            {profile.resumeUrl && (
+              <Button size="lg" variant="outline" onClick={() => window.open(profile.resumeUrl, "_blank", "noopener")} className="rounded-full px-7 h-12 glass-panel text-foreground font-semibold flex items-center gap-2 hover:bg-foreground/10 transition-all hover:-translate-y-1 border-foreground/10">
+                Resume <Download className="w-4 h-4" />
+              </Button>
+            )}
           </motion.div>
 
           {/* Social Links */}
@@ -96,11 +100,15 @@ export const HeroSection = () => {
             animate={{ opacity: 1 }}
             transition={{ delay: 0.8, duration: 0.8 }}
           >
-            {[Twitter, Github, Linkedin, Mail].map((Icon, i) => (
-              <a key={i} href="#" className="text-muted-foreground hover:text-foreground transition-colors hover:-translate-y-1 transform duration-200">
-                <Icon className="w-5 h-5" />
-              </a>
-            ))}
+            <a href={profile.linkedin} target="_blank" rel="noopener noreferrer" aria-label="LinkedIn" className="text-muted-foreground hover:text-foreground transition-colors hover:-translate-y-1 transform duration-200">
+              <Linkedin className="w-5 h-5" />
+            </a>
+            <a href={profile.behance} target="_blank" rel="noopener noreferrer" aria-label="Behance" className="text-muted-foreground hover:text-foreground transition-colors hover:-translate-y-1 transform duration-200 w-5 h-5 flex items-center justify-center">
+              <BehanceIcon />
+            </a>
+            <a href={`mailto:${profile.email}`} aria-label="Email" className="text-muted-foreground hover:text-foreground transition-colors hover:-translate-y-1 transform duration-200">
+              <Mail className="w-5 h-5" />
+            </a>
           </motion.div>
         </motion.div>
 
@@ -112,9 +120,9 @@ export const HeroSection = () => {
           transition={{ delay: 0.4, duration: 1, ease: [0.16, 1, 0.3, 1] }}
         >
           <HangingIdCard
-            name="Scarlett Rose"
-            role="Director of Engineering"
-            badgeId="SR-89240-PRO"
+            name={profile.name}
+            role={profile.role}
+            badgeId={`${profile.initials}-UX-2026`}
             accentColor="#8b5cf6"
             ropeLength={75}
             ropeColor="#27272a"
@@ -128,12 +136,18 @@ export const HeroSection = () => {
 
                 {/* Profile Photo with Dual Glowing Ring */}
                 <div className="mt-1 relative w-28 h-28 rounded-full p-1 bg-gradient-to-tr from-cyan-400 via-primary to-purple-400 backdrop-blur-md shadow-2xl border border-white/50 overflow-hidden group">
-                  <img 
-                    src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&q=80&w=800" 
-                    alt="Scarlett Rose" 
-                    className="w-full h-full object-cover rounded-full filter contrast-105"
-                    loading="eager"
-                  />
+                  {profile.photo ? (
+                    <img
+                      src={profile.photo}
+                      alt={profile.name}
+                      className="w-full h-full object-cover rounded-full filter contrast-105"
+                      loading="eager"
+                    />
+                  ) : (
+                    <div className="w-full h-full rounded-full bg-indigo-950/80 flex items-center justify-center text-3xl font-extrabold tracking-tight text-white">
+                      {profile.initials}
+                    </div>
+                  )}
                   <div className="absolute bottom-1 right-2 w-4 h-4 rounded-full bg-emerald-500 border-2 border-white shadow-md" />
                 </div>
               </div>
@@ -141,9 +155,9 @@ export const HeroSection = () => {
               {/* Card Body */}
               <div className="p-5 flex flex-col items-center text-center bg-card text-card-foreground flex-1 gap-3">
                 <div>
-                  <h3 className="text-xl font-extrabold tracking-tight text-foreground">Scarlett Rose</h3>
+                  <h3 className="text-xl font-extrabold tracking-tight text-foreground">{profile.name}</h3>
                   <div className="inline-flex items-center gap-1.5 mt-1 px-3 py-0.5 rounded-full bg-primary/10 border border-primary/30 text-primary text-xs font-semibold">
-                    <span>Director of Product Engineering</span>
+                    <span>{profile.currentTitle}, {profile.company}</span>
                   </div>
                 </div>
 
@@ -153,21 +167,19 @@ export const HeroSection = () => {
                 <div className="grid grid-cols-2 gap-2.5 w-full text-left bg-muted/40 p-3 rounded-xl border border-border/50">
                   <div>
                     <span className="text-muted-foreground block text-[9px] uppercase tracking-widest font-bold">Specialty</span>
-                    <span className="font-bold text-foreground text-xs">Full-Stack AI & UX</span>
+                    <span className="font-bold text-foreground text-xs">{profile.specialty}</span>
                   </div>
                   <div>
                     <span className="text-muted-foreground block text-[9px] uppercase tracking-widest font-bold">Location</span>
-                    <span className="font-bold text-foreground text-xs">San Francisco, CA</span>
+                    <span className="font-bold text-foreground text-xs">{profile.location}</span>
                   </div>
                   <div>
                     <span className="text-muted-foreground block text-[9px] uppercase tracking-widest font-bold">Experience</span>
-                    <span className="font-bold text-foreground text-xs">10+ Years</span>
+                    <span className="font-bold text-foreground text-xs">{profile.experience}</span>
                   </div>
                   <div>
-                    <span className="text-muted-foreground block text-[9px] uppercase tracking-widest font-bold">Status</span>
-                    <span className="font-bold text-emerald-500 text-xs flex items-center gap-1">
-                      ● Active
-                    </span>
+                    <span className="text-muted-foreground block text-[9px] uppercase tracking-widest font-bold">Focus</span>
+                    <span className="font-bold text-foreground text-xs">UX research</span>
                   </div>
                 </div>
 
@@ -187,10 +199,10 @@ export const HeroSection = () => {
                   </div>
                   <div className="flex items-center justify-between w-full px-1 text-[10px]">
                     <span className="font-mono font-bold tracking-widest text-primary">
-                      SR-89240-PRO
+                      {profile.initials}-UX-2026
                     </span>
                     <span className="text-muted-foreground font-semibold text-[9px] uppercase tracking-wider">
-                      LIGHTSWIND UI
+                      PORTFOLIO
                     </span>
                   </div>
                 </div>

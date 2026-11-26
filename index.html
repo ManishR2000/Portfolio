@@ -1,10 +1,17 @@
 <!doctype html>
-<html lang="en" data-theme="dark">
-  <head >
+<html lang="en" class="dark">
+  <head>
+    <script>
+      // Dark mode by default; switch to light only if the visitor chose it before
+      try {
+        if (localStorage.getItem("theme") === "light") document.documentElement.classList.remove("dark");
+      } catch (e) {}
+    </script>
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Vite + React + TS</title>
+    <meta name="description" content="Manish R, UI/UX designer. Interface design, wireframes, UX research and presentation design." />
+    <title>Manish R · UI/UX Designer</title>
   </head> 
   <body>
     <div id="root"></div>

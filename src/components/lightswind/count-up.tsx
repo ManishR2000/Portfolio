@@ -1,11 +1,16 @@
-import { useState, useEffect, useRef, useMemo } from "react";
+// Lightswind UI: Count Up (lightswind.com/components/count-up), code supplied by Manish. Only change: the unused React import.
+// Replaces an older, unused count-up.tsx from the original template.
+"use client";
+
+import { useState, useEffect, useRef } from "react"; // unused "React" import removed: this site's build rejects unused code
 import { motion, useMotionValue, useTransform, animate } from "framer-motion";
-import type { AnimationOptions } from "framer-motion";
-import { cn } from "../lib/utils";
+import { cn } from "@/components/lib/utils";
 
 // Helper function to format the number
 const formatValue = (val: number, precision: number, sep: string): string => {
-  return val.toFixed(precision).replace(/\B(?=(\d{3})+(?!\d))/g, sep);
+  return val
+    .toFixed(precision)
+    .replace(/\B(?=(\d{3})+(?!\d))/g, sep);
 };
 
 export interface CountUpProps {
@@ -26,27 +31,14 @@ export interface CountUpProps {
   onAnimationComplete?: () => void;
 }
 
-// Typed easing functions
-const easingFunctions: Record<
-  NonNullable<CountUpProps["easing"]>,
-  [number, number, number, number]
-> = {
+const easingFunctions = {
   linear: [0, 0, 1, 1],
   easeIn: [0.42, 0, 1, 1],
   easeOut: [0, 0, 0.58, 1],
   easeInOut: [0.42, 0, 0.58, 1],
 };
 
-// Animation style keys
-type AnimationStyleKey =
-  | "default"
-  | "bounce"
-  | "spring"
-  | "gentle"
-  | "energetic";
-
-// Typed animation styles
-const animationStyles: Record<AnimationStyleKey, Partial<AnimationOptions>> = {
+const animationStyles = {
   default: { type: "tween" },
   bounce: { type: "spring", bounce: 0.25 },
   spring: { type: "spring", stiffness: 100, damping: 10 },
@@ -54,14 +46,12 @@ const animationStyles: Record<AnimationStyleKey, Partial<AnimationOptions>> = {
   energetic: { type: "spring", stiffness: 300, damping: 20 },
 };
 
-// Color schemes
-const colorSchemes: Record<NonNullable<CountUpProps["colorScheme"]>, string> = {
+const colorSchemes = {
   default: "text-foreground",
-  gradient:
-    "bg-clip-text text-transparent bg-gradient-to-r from-blue-500 to-purple-600",
+  gradient: "bg-clip-text text-transparent bg-gradient-to-r from-primarylw to-purple-600",
   primary: "text-primary",
   secondary: "text-secondary",
-  custom: "", // use customColor
+  custom: "",
 };
 
 export function CountUp({
@@ -84,84 +74,60 @@ export function CountUp({
   const [hasAnimated, setHasAnimated] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
   const count = useMotionValue(0);
-
-  const rounded = useTransform(count, (latest) => {
-    return formatValue(latest, decimals, separator);
-  });
-
-  // Animation config without `any`
-  const animationConfig = useMemo<Partial<AnimationOptions>>(
-    () => ({
-      ...animationStyles[animationStyle],
-      ease: easingFunctions[easing],
-      duration: animationStyle === "default" ? duration : undefined,
-    }),
-    [animationStyle, easing, duration] // dependencies
+  const rounded = useTransform(count, (latest) =>
+    formatValue(latest, decimals, separator)
   );
 
-  // Trigger animation
   useEffect(() => {
-    if (!triggerOnView) {
-      animate(count.get(), value, {
-        ...animationConfig,
+    let controls: { stop: () => void } | null = null;
+
+    const startAnimation = () => {
+      controls = animate(count.get(), value, {
+        ...(animationStyles[animationStyle] as any),
+        ease: easingFunctions[easing],
+        duration: animationStyle === "default" ? duration : undefined,
         onUpdate: (latest) => count.set(latest),
         onComplete: () => {
           setHasAnimated(true);
-          if (onAnimationComplete) onAnimationComplete();
+          onAnimationComplete?.();
         },
       });
-      return;
+    };
+
+    if (!triggerOnView || hasAnimated) {
+      startAnimation();
+      return () => controls?.stop();
     }
 
     const observer = new IntersectionObserver(
       ([entry]) => {
         if (entry.isIntersecting && !hasAnimated) {
-          animate(count.get(), value, {
-            ...animationConfig,
-            onUpdate: (latest) => count.set(latest),
-            onComplete: () => {
-              setHasAnimated(true);
-              if (onAnimationComplete) onAnimationComplete();
-            },
-          });
+          startAnimation();
         }
       },
       { threshold: 0.1 }
     );
 
-    if (containerRef.current) observer.observe(containerRef.current);
-    return () => observer.disconnect();
-  }, [
-    value,
-    triggerOnView,
-    hasAnimated,
-    animationConfig,
-    count,
-    onAnimationComplete,
-  ]);
-
-  // Update if value changes after animation
-  useEffect(() => {
-    if (hasAnimated || !triggerOnView) {
-      animate(count.get(), value, {
-        ...animationConfig,
-        onUpdate: (latest) => count.set(latest),
-        onComplete: onAnimationComplete,
-      });
+    if (containerRef.current) {
+      observer.observe(containerRef.current);
     }
-  }, [
-    value,
-    animationConfig,
-    hasAnimated,
-    triggerOnView,
-    onAnimationComplete,
-    count,
-  ]);
 
+    return () => {
+      controls?.stop();
+      observer.disconnect();
+    };
+  }, [value, duration, easing, animationStyle, triggerOnView, hasAnimated, onAnimationComplete, count]);
+
+  const hasCustomTextColor = className?.includes("text-") || numberClassName?.includes("text-");
   const colorClass =
-    colorScheme === "custom" && customColor ? "" : colorSchemes[colorScheme];
+    colorScheme === "custom" && customColor
+      ? ""
+      : colorScheme !== "default"
+      ? colorSchemes[colorScheme]
+      : hasCustomTextColor
+      ? ""
+      : colorSchemes.default;
 
-  // Hover interaction
   const getHoverAnimation = () => {
     if (!interactive) return {};
     return {
@@ -182,27 +148,23 @@ export function CountUp({
     <div
       ref={containerRef}
       className={cn(
-        "inline-flex items-center justify-center text-4xl font-bold text-black dark:text-white",
+        "inline-flex items-center justify-center font-bold",
+        !hasCustomTextColor && "text-foreground",
+        !className?.includes("text-") && "text-4xl",
         className
       )}
     >
       <motion.div
         {...getHoverAnimation()}
-        className={cn(
-          "flex items-center transition-all",
-          colorClass,
-          numberClassName
-        )}
-        style={
-          colorScheme === "custom" && customColor
-            ? { color: customColor }
-            : undefined
-        }
+        className={cn("flex items-center transition-all", colorClass, numberClassName)}
+        style={colorScheme === "custom" && customColor ? { color: customColor } : undefined}
       >
-        {prefix && <span className="mr-1 text-foreground">{prefix}</span>}
-        <motion.span className="text-foreground">{rounded}</motion.span>
-        {suffix && <span className="ml-1 text-foreground">{suffix}</span>}
+        {prefix && <span className="mr-1">{prefix}</span>}
+        <motion.span>{rounded}</motion.span>
+        {suffix && <span className="ml-1">{suffix}</span>}
       </motion.div>
     </div>
   );
 }
+
+export default CountUp;

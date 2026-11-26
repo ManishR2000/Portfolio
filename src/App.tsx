@@ -7,11 +7,11 @@ import { ServicesSection } from "./components/ServicesSection/ServicesSection";
 import { ProjectsSection } from "./components/ProjectsSection/ProjectsSection";
 import { EducationSection } from "./components/EducationSection/EducationSection";
 import { CareerTimeline } from "./components/CareerSection/CareerTimeline";
-import TestimonialsSection from "./components/TestimonialsSection/TestimonialsSection";
+import { RecognitionSection } from "./components/RecognitionSection/RecognitionSection";
 import { ContactSection } from "./components/ContactSection/ContactSection";
 import { Footer } from "./components/Footer/Footer";
 import ReactLenis from "lenis/react";
-import { Home, User, GraduationCap, Briefcase, FolderKanban, Send, MessageSquare } from "lucide-react";
+import { Home, User, GraduationCap, Briefcase, FolderKanban, Send, Award } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
 import Dock from "./components/lightswind/dock";
@@ -50,15 +50,15 @@ function App() {
   const dockItems = [
     { icon: <Home size={20} />, label: "Home", onClick: () => scrollToSection("hero") },
     { icon: <User size={20} />, label: "About", onClick: () => scrollToSection("about") },
+    { icon: <FolderKanban size={20} />, label: "Work", onClick: () => scrollToSection("projects") },
     { icon: <Briefcase size={20} />, label: "Career", onClick: () => scrollToSection("career") },
-    { icon: <FolderKanban size={20} />, label: "Projects", onClick: () => scrollToSection("projects") },
-    { icon: <GraduationCap size={20} />, label: "Education", onClick: () => scrollToSection("education") },
-    { icon: <MessageSquare size={20} />, label: "Testimonials", onClick: () => scrollToSection("testimonials") },
+    { icon: <GraduationCap size={20} />, label: "Skills", onClick: () => scrollToSection("skills") },
+    { icon: <Award size={20} />, label: "Recognition", onClick: () => scrollToSection("recognition") },
     { icon: <Send size={20} />, label: "Contact", onClick: () => scrollToSection("contact") },
   ];
 
   return (
-    <div className="bg-transparent min-h-screen relative overflow-x-hidden selection:bg-primary/30 selection:text-primary-foreground">
+    <div className="bg-transparent min-h-screen relative overflow-x-clip selection:bg-primary/30 selection:text-primary-foreground">
       <SmoothCursor glowEffect showTrail trailLength={4} />
       <ReactLenis root options={{ smoothWheel: true, duration: 1.2 }}>
         <Header />
@@ -70,7 +70,7 @@ function App() {
           <ProjectsSection />
           <CareerTimeline />
           <EducationSection />
-          <TestimonialsSection />
+          <RecognitionSection />
           <ContactSection />
         </main>
 

@@ -7,7 +7,7 @@ import {
   MotionValue,
 } from "framer-motion";
 import { cn } from "../lib/utils";
-import { Card, CardContent } from "./card";
+import { MagicCard } from "./magic-card";
 import { Calendar } from "lucide-react";
 
 export interface TimelineEvent {
@@ -86,9 +86,12 @@ export const ScrollTimeline = ({
   const [activeIndex, setActiveIndex] = useState(-1);
   const timelineRefs = useRef<(HTMLDivElement | null)[]>([]);
 
+  // PORTFOLIO CHANGE: measure scroll on the line's own container, from its top reaching the middle of the
+  // screen to its bottom reaching the middle, so the line's tip follows the centre of the screen
+  const lineAreaRef = useRef<HTMLDivElement>(null);
   const { scrollYProgress } = useScroll({
-    target: scrollRef,
-    offset: ["start start", "end end"],
+    target: lineAreaRef,
+    offset: ["start center", "end center"],
   });
 
   const smoothProgress = useSpring(scrollYProgress, {
@@ -105,19 +108,22 @@ export const ScrollTimeline = ({
 
   const progressHeight = useTransform(smoothProgress, [0, 1], ["0%", "100%"]);
 
+  // PORTFOLIO CHANGE: a dot lights up exactly when the drawn line reaches it (the original split the scroll into
+  // equal slices, which didn't match where the dots sit, so the line could pass a dot without lighting it)
   useEffect(() => {
-    const unsubscribe = scrollYProgress.onChange((v) => {
-      const newIndex = Math.floor(v * events.length);
-      if (
-        newIndex !== activeIndex &&
-        newIndex >= 0 &&
-        newIndex < events.length
-      ) {
-        setActiveIndex(newIndex);
-      }
-    });
-    return () => unsubscribe();
-  }, [scrollYProgress, events.length, activeIndex]);
+    const update = (v: number) => {
+      const area = lineAreaRef.current;
+      if (!area) return;
+      const tip = v * area.offsetHeight; // how far down the line is drawn, in px
+      let index = -1;
+      timelineRefs.current.forEach((item, i) => {
+        if (item && item.offsetTop + item.offsetHeight / 2 <= tip + 1) index = i; // dot sits at the item's centre
+      });
+      setActiveIndex((prev) => (prev === index ? prev : index));
+    };
+    update(smoothProgress.get());
+    return smoothProgress.on("change", update);
+  }, [smoothProgress, events.length]);
 
   const getConnectorClasses = () => {
     const baseClasses = cn(
@@ -164,7 +170,9 @@ export const ScrollTimeline = ({
         : "lg:ml-auto lg:mr-0";
     return cn(
       baseClasses,
-      variantClasses[cardVariant],
+      // PORTFOLIO CHANGE: the MagicCard inside draws the card's box now, so the wrapper adds no box of its own
+      // (otherwise two boxes show, one inside the other)
+      false && variantClasses[cardVariant],
       effectClasses[cardEffect],
       alignmentClassesDesktop,
       "w-full lg:w-[calc(50%-40px)]"
@@ -219,20 +227,20 @@ export const ScrollTimeline = ({
     <div
       ref={scrollRef}
       className={cn(
-        "relative min-h-screen w-full overflow-hidden",
+        "relative w-full overflow-hidden", // PORTFOLIO CHANGE: no full-screen minimum height, so spacing matches other sections
         darkMode ? "bg-background text-foreground" : "",
         className
       )}
     >
-      <div className="text-center py-16 px-4">
+      <div className="text-center pt-16 pb-12 px-4">
         <h2 className="text-3xl md:text-5xl font-bold mb-4">{title}</h2>
         <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
           {subtitle}
         </p>
       </div>
 
-      <div className="relative max-w-7xl mx-auto px-4 pb-24">
-        <div className="relative mx-auto">
+      <div className="relative max-w-7xl mx-auto px-4 pb-16">
+        <div className="relative mx-auto" ref={lineAreaRef}>
           <div
             className={cn(getConnectorClasses(), "h-full absolute top-0 z-10")}
           />
@@ -289,7 +297,7 @@ export const ScrollTimeline = ({
                     timelineRefs.current[index] = el; // <-- correct
                   }}
                   className={cn(
-                    "relative flex items-center mb-20 py-4 flex-col lg:flex-row",
+                    "relative flex items-center mb-20 last:mb-0 py-4 flex-col lg:flex-row",
                     cardAlignment === "alternating"
                       ? index % 2 === 0
                         ? "lg:justify-start"
@@ -335,8 +343,15 @@ export const ScrollTimeline = ({
                     viewport={animationProps.viewport}
                     style={parallaxIntensity > 0 ? { y: yOffset } : undefined}
                   >
-                    <Card className="bg-background border">
-                      <CardContent className="p-6">
+                    {/* PORTFOLIO CHANGE: same hover effect as the "What I do" cards */}
+                    <MagicCard
+                      className="p-6 rounded-[2rem] border border-border/80 bg-card/80 cursor-default"
+                      gradientSize={280}
+                      gradientColor="rgba(139, 92, 246, 0.12)"
+                      gradientFrom="#8b5cf6"
+                      gradientTo="#38bdf8"
+                    >
+                      <div>
                         {dateFormat === "badge" ? (
                           <div className="flex items-center mb-2">
                             {event.icon || (
@@ -369,8 +384,8 @@ export const ScrollTimeline = ({
                         <p className="text-muted-foreground">
                           {event.description}
                         </p>
-                      </CardContent>
-                    </Card>
+                      </div>
+                    </MagicCard>
                   </motion.div>
                 </div>
               );

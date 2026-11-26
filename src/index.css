@@ -1,6 +1,9 @@
 @import 'tailwindcss';
+@custom-variant dark (&:where(.dark, .dark *));
 @plugin 'lightswind/plugin';
 @theme {
+  --color-primarylw: var(--primarylw);
+  --color-primarylw-2: var(--primarylw-2);
   --color-background: var(--bg);
   --color-foreground: var(--fg);
   --color-card: var(--card);

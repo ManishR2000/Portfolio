@@ -1,22 +1,10 @@
 import { motion } from "framer-motion";
 
-const technologies = [
-  { name: "React", icon: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/react/react-original.svg" },
-  { name: "Next.js", icon: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/nextjs/nextjs-original.svg" },
-  { name: "TypeScript", icon: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/typescript/typescript-original.svg" },
-  { name: "Node.js", icon: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/nodejs/nodejs-original.svg" },
-  { name: "GraphQL", icon: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/graphql/graphql-plain.svg" },
-  { name: "Tailwind CSS", icon: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/tailwindcss/tailwindcss-original.svg" },
-  { name: "Framer Motion", icon: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/framermotion/framermotion-original.svg" },
-  { name: "MongoDB", icon: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/mongodb/mongodb-original.svg" },
-  { name: "PostgreSQL", icon: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/postgresql/postgresql-original.svg" },
-  { name: "AWS", icon: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/amazonwebservices/amazonwebservices-plain-wordmark.svg" },
-  { name: "Docker", icon: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/docker/docker-original.svg" },
-  { name: "Kubernetes", icon: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/kubernetes/kubernetes-original.svg" },
-  { name: "Redis", icon: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/redis/redis-original.svg" },
-  { name: "Figma", icon: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/figma/figma-original.svg" },
-  { name: "Redux", icon: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/redux/redux-original.svg" },
-];
+import { tools } from "../../content";
+import { toolLogos } from "./toolLogos";
+
+const initials = (name: string) =>
+  name.replace(/^(Adobe|Microsoft|Google)\s+/, "").split(/[\s-]+/).map((w) => w[0]).join("").slice(0, 2);
 
 const TechStackSection = () => {
   return (
@@ -34,19 +22,23 @@ const TechStackSection = () => {
         
         {/* Marquee Animation */}
         <div className="flex w-max animate-[marquee_35s_linear_infinite] whitespace-nowrap items-center hover:[animation-play-state:paused] py-1">
-          {[...technologies, ...technologies].map((tech, i) => (
+          {[...tools, ...tools].map((tool, i) => (
             <div 
               key={i} 
               className="mx-3 px-5 py-2.5 rounded-full border border-foreground/10 bg-background/80 text-foreground font-medium text-sm flex items-center gap-3 transition-all hover:scale-105 hover:border-primary/50 hover:bg-foreground/5 cursor-default shadow-sm group shrink-0"
             >
-              <img 
-                src={tech.icon} 
-                alt={tech.name} 
-                className="w-5 h-5 object-contain group-hover:scale-110 transition-transform duration-300 dark:invert-0" 
-                loading="lazy"
-                decoding="async" 
-              />
-              <span className="tracking-wide text-xs md:text-sm">{tech.name}</span>
+              {toolLogos[tool]?.src ? (
+                <img
+                  src={toolLogos[tool].src!}
+                  alt=""
+                  className={`w-5 h-5 object-contain ${toolLogos[tool].invert ? "dark:invert" : ""}`}
+                />
+              ) : (
+                <span aria-hidden="true" className="w-5 h-5 rounded-md bg-foreground/10 text-foreground text-[10px] font-bold flex items-center justify-center">
+                  {initials(tool)}
+                </span>
+              )}
+              <span className="tracking-wide text-xs md:text-sm">{tool}</span>
             </div>
           ))}
         </div>

@@ -1,15 +1,11 @@
 import { motion } from "framer-motion";
-import { Github, Linkedin, Twitter, Mail, ArrowUp, Heart } from "lucide-react";
+import { Linkedin, Mail, ArrowUp } from "lucide-react";
+import { profile, footer } from "../../content";
+import { BehanceIcon } from "../icons/BehanceIcon";
 import { MorphingText } from "../lightswind/morphing-text";
 
 export const Footer = () => {
-  const morphingTexts = [
-    "Full-Stack Developer",
-    "UI/UX Architect",
-    "AI Systems Engineer",
-    "Product Builder",
-    "Scarlett Rose",
-  ];
+  const morphingTexts = footer.rotatingWords;
 
   const scrollToTop = () => {
     window.scrollTo({ top: 0, behavior: "smooth" });
@@ -18,21 +14,21 @@ export const Footer = () => {
   const navLinks = [
     { name: "Home", href: "#hero" },
     { name: "About", href: "#about" },
+    { name: "Work", href: "#projects" },
     { name: "Career", href: "#career" },
-    { name: "Projects", href: "#projects" },
-    { name: "Education", href: "#education" },
+    { name: "Skills", href: "#skills" },
+    { name: "Recognition", href: "#recognition" },
     { name: "Contact", href: "#contact" },
   ];
 
   const socialLinks = [
-    { icon: Twitter, href: "#", label: "Twitter" },
-    { icon: Github, href: "#", label: "GitHub" },
-    { icon: Linkedin, href: "#", label: "LinkedIn" },
-    { icon: Mail, href: "mailto:hello@scarlettrose.dev", label: "Email" },
+    { icon: Linkedin, href: profile.linkedin, label: "LinkedIn" },
+    { icon: BehanceIcon, href: profile.behance, label: "Behance" },
+    { icon: Mail, href: `mailto:${profile.email}`, label: "Email" },
   ];
 
   return (
-    <footer className="w-full relative z-10 pt-16 pb-28 md:pb-36 bg-card/60 backdrop-blur-2xl border-t border-black/5 dark:border-white/10 shadow-2xl rounded-t-[3rem] overflow-hidden">
+    <footer className="w-full relative z-10 -mt-[10px] pt-16 pb-28 md:pb-36 bg-card/60 backdrop-blur-2xl border-t border-black/5 dark:border-white/10 shadow-2xl rounded-t-[3rem] overflow-hidden">
       {/* Background ambient glow */}
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[350px] bg-primary/10 blur-[140px] rounded-full pointer-events-none" />
 
@@ -44,16 +40,16 @@ export const Footer = () => {
             <div className="relative w-10 h-10 rounded-xl bg-gradient-to-tr from-purple-600 via-primary to-sky-400 p-[1px] shadow-lg">
               <div className="w-full h-full bg-background rounded-[11px] flex items-center justify-center">
                 <span className="font-extrabold text-xs tracking-tighter bg-gradient-to-r from-purple-500 to-sky-400 bg-clip-text text-transparent">
-                  SR
+                  {profile.initials}
                 </span>
               </div>
             </div>
             <div className="flex flex-col text-left">
               <span className="font-extrabold tracking-tight text-foreground text-base leading-none">
-                Scarlett Rose
+                {profile.name}
               </span>
               <span className="text-[10px] font-bold text-muted-foreground tracking-widest uppercase mt-0.5">
-                Director of Product Engineering
+                {profile.role}
               </span>
             </div>
           </div>
@@ -72,13 +68,13 @@ export const Footer = () => {
         {/* Center Banner: Morphing Text Container with Mild Borders */}
         <div className="py-12 px-6 rounded-3xl bg-black/[0.015] dark:bg-white/[0.02] border border-black/5 dark:border-white/10 text-center flex flex-col items-center justify-center my-2 shadow-sm">
           <span className="text-xs font-extrabold uppercase tracking-widest text-primary mb-3 bg-primary/10 px-4 py-1.5 rounded-full border border-primary/20 shadow-sm">
-            Innovate & Build
+            {footer.tagline}
           </span>
 
           <MorphingText
             texts={morphingTexts}
-            morphTime={1.6}
-            cooldownTime={0.8}
+            morphTime={1.1}
+            cooldownTime={0.7}
             className="text-3xl md:text-5xl lg:text-6xl text-foreground font-extrabold min-h-[70px] text-center"
           />
         </div>
@@ -107,6 +103,8 @@ export const Footer = () => {
                   key={i}
                   href={social.href}
                   aria-label={social.label}
+                  target={social.href.startsWith("http") ? "_blank" : undefined}
+                  rel="noopener noreferrer"
                   className="w-10 h-10 rounded-full glass-panel border border-black/5 dark:border-white/10 flex items-center justify-center text-muted-foreground hover:text-foreground hover:border-primary/40 hover:scale-110 transition-all shadow-sm"
                 >
                   <Icon className="w-4 h-4" />
@@ -117,9 +115,7 @@ export const Footer = () => {
 
           {/* Copyright notice */}
           <div className="flex items-center gap-1.5 font-medium text-center md:text-right">
-            <span>© {new Date().getFullYear()} Scarlett Rose. Crafted with</span>
-            <Heart className="w-3.5 h-3.5 text-rose-500 fill-rose-500 inline-block" />
-            <span>& Lightswind UI</span>
+            <span>© {new Date().getFullYear()} {profile.name}. Built with Lightswind UI.</span>
           </div>
         </div>
 
